@@ -52,11 +52,13 @@ class My_Server(BaseHTTPRequestHandler):
 			data = json.loads(post_data)
 		except Exception as e:
 			print ('Could not parse JSON DATA..')
-		
-		ret_data = data['key1']
-		#bashFile.write(data)
-		ret_bytes = str.encode(json.dumps(ret_data))
 
+		ret_data = data['key1']
+		ret_bytes = str.encode(json.dumps(ret_data))
+		print(ret_bytes)
+		self.send("You are connected")
+		print(self.path)
+		print(self.rfile.read(content_length))
 		self._set_headers()
 		self.wfile.write(ret_bytes)
 
@@ -65,7 +67,7 @@ def add_content_length(header, data):
 
 
 def run(server_class=HTTPServer, handler_class=My_Server, port=8080):
-	server_address = ('', port)
+	server_address = ('127.0.0.1', port)
 	httpd = server_class(server_address, handler_class)
 	print ('Starting httpd : http://127.0.0.1:{}'.format(port))
 	httpd.serve_forever()
