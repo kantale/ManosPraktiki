@@ -14,48 +14,51 @@ def Main():
     s.listen(1)
     c, addr = s.accept()
     print("Connection from: " + str(addr))
-    # Create dockerfile to write the code from requests
-    dockerfile = open('Dockerfile', 'r')
-
     while True:
-        data = c.recv(1024)
-        if not data or data.decode() == '+q':
+        data = c.recv(2048)
+        if not data or data.decode('utf-8') == 'q':
             break
-        print("from connected user :" + data.decode())
-        #write in file and at the end insert \n for new line
-        #dockerfile.write(str(data.decode()) + '\n')
-	#send in client message
-        if data.decode() == '+r':
-            c.send("Which container : ".encode())
-            data = c.recv(1024)
-            execute("sudo docker run " + data.decode())
-        elif data.decode() == '+w':
-            c.send("Give name for the container : ".encode())
-            data = c.recv(1024)
-            execute("sudo docker build -t " + data.decode() + " .")
-            execute("sudo docker run " + data.decode())
-
-    dockerfile.close()
+        if data.decode('utf-8') == 'b':
+            print("recieved sudossss(bash) :    " + data.decode('utf-8'))
+            data = c.recv(2048)
+            r = execute(data.decode('utf-8'))
+            jsfile = json.dumps(r)
+            if jsfile:
+                c.send(jsfile.encode())
+                break
+        elif data.decode('utf-8') == 'w':
+            print("recieved sudossss(without) :    " + data.decode('utf-8'))
+            changefolder = execute('cd dockerwithoutbash/')
+            data = c.recv(2048)
+            subprocess.call('ls', shell=True)
+            r = execute(data.decode('utf-8'))
+            jsfile = json.dumps(r)
+            if jsfile:
+                c.send(jsfile.encode())
+                break
 
     c.close()
 
 
 
 def execute(cm):
-    # insert you code here
-    sudoPassword = 'INSERT_YOUR CODE'
     process = subprocess.Popen(cm, shell=True, stdout=subprocess.PIPE,stderr = subprocess.PIPE)
-    passSudo = subprocess.Popen(sudoPassword, shell=True, stdout=subprocess.PIPE,stderr = subprocess.PIPE)
 
     out,err = process.communicate()
     errcode = process.returncode
 
     out = out.decode('utf-8')
-    print(out + " ")
+    print("STDOUT : " + out)
     err = err.decode('utf-8')
-    print(err + " ")
+    print("STDERR : " + err)
+
+    print("ERROR CODE : "+ str(errcode))
+    return {
+            "stdout": out,
+            "stderr": err,
+            "error_code": errcode
+    }
 
 
 if __name__ == "__main__":
     Main()
-

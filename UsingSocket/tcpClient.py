@@ -1,3 +1,4 @@
+import json
 import socket
 
 def Main():
@@ -7,24 +8,27 @@ def Main():
     s = socket.socket()
     s.connect((host,port))
 
-    message = input("Give +w (install container) or +r (run container) : ")
-    while message != 'q':
-        if message == '+r':
+    message = input("with bash(b) or without(w)->")
+    while message != 'q' or command != 'q':
+        if message == 'b':
             s.send(message.encode())
-            data = s.recv(1024)
-            print("Recieved from server :" + str(data))
-            message =input("-> ")
+            command = input("->")
+            s.send(command.encode())
+            data = s.recv(25000)
+            jdata = data.decode('utf-8')
+            if jdata :
+                print(jdata)
+                break
+        elif message == 'w':
             s.send(message.encode())
-        elif message == '+w':
-            s.send(message.encode())
-            data = s.recv(1024)
-            print("Recieved from server :" + str(data))
-            message =input("-> ")
-            s.send(message.encode())
-        else:
-            break
+            command = input("->")
+            s.send(command.encode())
+            data = s.recv(25000)
+            jdata = data.decode('utf-8')
+            if jdata :
+                print(jdata)
+                break
     s.close()
-
 
 
 if __name__ == "__main__":

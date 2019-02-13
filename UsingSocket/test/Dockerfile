@@ -11,10 +11,7 @@ RUN  apt-get update \
 # CMD ["./plink", "--noweb"]
 
 ADD test_bash.sh /root/ 
-RUN chmod +x /root/test_bash.sh  
 
 
-ENTRYPOINT ["/root/test_bash.sh"]
-
-
+RUN cd /root; chmod +x test_bash.sh ; /bin/bash test_bash.sh
 
