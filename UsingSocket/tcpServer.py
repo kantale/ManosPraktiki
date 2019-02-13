@@ -8,15 +8,20 @@ def Main():
 
     s = socket.socket()
     # bind socket to a port
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host,port))
 
     # he only listen in one con (every time)
     s.listen(1)
     c, addr = s.accept()
     print("Connection from: " + str(addr))
+    communicateWithClient(s,c,addr)
+
+
+def communicateWithClient(s,c,addr):
     while True:
         data = c.recv(2048)
-        if not data or data.decode('utf-8') == 'q':
+        if not data:
             break
         if data.decode('utf-8') == 'b':
             print("recieved sudossss(bash) :    " + data.decode('utf-8'))
@@ -25,19 +30,19 @@ def Main():
             jsfile = json.dumps(r)
             if jsfile:
                 c.send(jsfile.encode())
-                break
         elif data.decode('utf-8') == 'w':
             print("recieved sudossss(without) :    " + data.decode('utf-8'))
-            changefolder = execute('cd dockerwithoutbash/')
             data = c.recv(2048)
-            subprocess.call('ls', shell=True)
+            #subprocess.call('cd /dockerwithoutbash', shell=True)
             r = execute(data.decode('utf-8'))
             jsfile = json.dumps(r)
             if jsfile:
                 c.send(jsfile.encode())
-                break
+        elif data.decode('utf-8') == 'q':
+            c.close()
+        else:
+            communicateWithClient(s,c,addr)
 
-    c.close()
 
 
 

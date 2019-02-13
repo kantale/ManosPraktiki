@@ -4,32 +4,34 @@ import socket
 def Main():
     host = "127.0.0.1"
     port = 8050
-
     s = socket.socket()
     s.connect((host,port))
+    communicateWithServer(s)
 
+
+def communicateWithServer(s):
     message = input("with bash(b) or without(w)->")
-    while message != 'q' or command != 'q':
+    while message != 'q':
         if message == 'b':
             s.send(message.encode())
-            command = input("->")
-            s.send(command.encode())
+            message = input("->")
+            s.send(message.encode())
             data = s.recv(25000)
             jdata = data.decode('utf-8')
             if jdata :
                 print(jdata)
-                break
         elif message == 'w':
             s.send(message.encode())
-            command = input("->")
-            s.send(command.encode())
+            message = input("->")
+            s.send(message.encode())
             data = s.recv(25000)
             jdata = data.decode('utf-8')
             if jdata :
-                print(jdata)
-                break
+                convjson = json.loads(jdata)
+                print(convjson)
+        else:
+            communicateWithServer(s)
     s.close()
-
 
 if __name__ == "__main__":
     Main()
