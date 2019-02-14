@@ -9,5 +9,5 @@ cd plink-1.07-x86_64
 #./plink --noweb --file test
 ./plink --noweb
 
-
+# Alex change
 
